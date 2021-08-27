@@ -10,17 +10,14 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var viewModel: EmojiMemoryGame
     
-    var vehicleEmojis = ["🚗", "🚕", "🚙", "🚌", "🚎", "🏎", "🚓", "🚑", "🚒", "🚐", "🛻", "🚚", "🚛", "🚜", "🛴", "🚲", "🛵", "🏍", "🛺", "🚔", "✈️", "🛫", "🛬", "🛩", "🚆", "🚂", "🚅", "🚡", "🚠"]
-    var flagEmojis = ["🇰🇭", "🇨🇱", "🇭🇰", "🇪🇺", "🇷🇼", "🇰🇷", "🇳🇱", "🇲🇷", "🇲🇦", "🇳🇴", "🇱🇻", "🇱🇧", "🇲🇼", "🇲🇨", "🇲🇸", "🇲🇺", "🇱🇷", "🇯🇵"
-    ]
-    var animalEmojis = ["🐥", "🪲", "🦞", "🦕", "🐙", "🐮", "🐷", "🐡", "🐊", "🦈", "🦧", "🐄", "🦙", "🐓", "🦚", "🐿", "🦥"
-    ]
     @State var emojiTheme = "vehicles"
     @State var emojiCount = 8
     
     var body: some View {
         VStack {
-            Text("Memorize!")
+            Text(EmojiMemoryGame.theme.name)
+                .font(.largeTitle)
+                .padding(.vertical)
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 65))]) {
                     ForEach(viewModel.cards) { card in
@@ -31,22 +28,33 @@ struct ContentView: View {
                     }
                 }
             }
-            .foregroundColor(.red)
+            .foregroundColor(viewModel.cards[0].color)
             Spacer()
             HStack {
+                Text("Score: \(viewModel.score)")
+                Spacer()
 //                remove
 //                Spacer()
 //                add
-                chooseVehicles
-                Spacer()
-                chooseFlags
-                Spacer()
-                chooseAnimals
+//                chooseVehicles
+//                Spacer()
+//                chooseFlags
+//                Spacer()
+//                chooseAnimals
+                newGame
             }
-            .font(.largeTitle)
-            .padding(.horizontal)
+            .font(.title2)
+            .padding()
         }
         .padding(.horizontal)
+    }
+    
+    var newGame: some View {
+        Button {
+            viewModel.newGame()
+        } label: {
+            Text("New Game")
+        }
     }
     
     var remove: some View {
@@ -56,16 +64,6 @@ struct ContentView: View {
             }
         } label: {
             Image(systemName: "minus.circle")
-        }
-    }
-    var add: some View {
-        Button {
-            let emojis = emojiTheme == "vehicles" ? vehicleEmojis : emojiTheme == "flags" ? flagEmojis : animalEmojis
-            if emojiCount < emojis.count {
-                emojiCount += 1
-            }
-        } label: {
-            Image(systemName: "plus.circle")
         }
     }
     var chooseVehicles: some View {
@@ -113,6 +111,8 @@ struct CardView: View {
                 shape.fill().foregroundColor(.white)
                 shape.strokeBorder(lineWidth: 12)
                 Text(card.content).font(.largeTitle)
+            } else if card.isMatched {
+                shape.opacity(0)
             } else {
                 shape.fill()
             }
